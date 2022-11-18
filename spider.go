@@ -27,6 +27,7 @@ type RespErr struct {
 
 type TableResource struct {
 	Code     string  `json:"Code"`
+	Guid     string  `json:"Guid"`
 	Name     string  `json:"Name"`
 	Calen    string  `json:"Calen"`
 	Cost_8x5 float64 `json:"c_tim_8x5_FTE"`
