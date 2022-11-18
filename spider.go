@@ -120,6 +120,7 @@ func GetTableHandle(url, docHandle, tableName string) (string, error) {
 	return tableHandle, nil
 }
 
+//map[Guid] = Code (email сотрудника)
 func GetTableResource(url, tableHandle string) (map[string]string, error) {
 	var respGT RespJSONResource
 	body := []byte(`{"command":"getTable","tableHandle":` + tableHandle + `,"sessId":""}`) //получем значения в таблице
