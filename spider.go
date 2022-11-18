@@ -26,17 +26,19 @@ type RespErr struct {
 }
 
 type TableResource struct {
-	Code     string  `json:"Code"`
-	Guid     string  `json:"Guid"`
-	Name     string  `json:"Name"`
-	Calen    string  `json:"Calen"`
-	Cost_8x5 float64 `json:"c_tim_8x5_FTE"`
-	Overtime float64 `json:"c_tim_Out_of_Hours"`
-	Grade    string  `json:"GRD"`
-	DUName   string  `json:"DUN"`
-	Line_man string  `json:"ЛИН_РУК"`
-	Location string  `json:"ЛКЦ"`
-	Number   int     `json:"Number"`
+	Code string `json:"Code"`
+	Guid string `json:"Guid"`
+	/*
+		Name     string  `json:"Name"`
+		Calen    string  `json:"Calen"`
+		Cost_8x5 float64 `json:"c_tim_8x5_FTE"`
+		Overtime float64 `json:"c_tim_Out_of_Hours"`
+		Grade    string  `json:"GRD"`
+		DUName   string  `json:"DUN"`
+		Line_man string  `json:"ЛИН_РУК"`
+		Location string  `json:"ЛКЦ"`
+		Number   int     `json:"Number"`
+	*/
 }
 
 type FieldsTable struct {
@@ -118,7 +120,7 @@ func GetTableHandle(url, docHandle, tableName string) (string, error) {
 	return tableHandle, nil
 }
 
-func GetTableResource(url, tableHandle string) ([]TableResource, error) {
+func GetTableResource(url, tableHandle string) (map[string]string, error) {
 	var respGT RespJSONResource
 	body := []byte(`{"command":"getTable","tableHandle":` + tableHandle + `,"sessId":""}`) //получем значения в таблице
 	reqGetTable, err := http.Post(url, "application/json", bytes.NewBuffer(body))
@@ -131,13 +133,18 @@ func GetTableResource(url, tableHandle string) ([]TableResource, error) {
 	if err != nil {
 		return nil, fmt.Errorf("ошибка чтения ответа json команды getTable таблицы Resource: %v", err)
 	}
+	mapGuid := make(map[string]string, len(respGT.Array))
+	for _, el := range respGT.Array {
+		mapGuid[el.Guid] = el.Code
+	}
 	if len(respGT.ErrorResp) > 0 {
-		return respGT.Array, fmt.Errorf("ошибка на getTable таблицы Resource: %v", respGT.ErrorResp)
+		return mapGuid, fmt.Errorf("ошибка на getTable таблицы Resource: %v", respGT.ErrorResp)
 	}
 	if respGT.ErrCode > 0 {
-		return respGT.Array, fmt.Errorf("ошибка без описания на getTable таблицы Resource: %v", respGT.ErrorResp)
+		return mapGuid, fmt.Errorf("ошибка без описания на getTable таблицы Resource: %v", respGT.ErrorResp)
 	}
-	return respGT.Array, nil
+
+	return mapGuid, nil
 }
 
 func GetTableGanttAct(url, tableHandle string) ([]TableGanttAct, error) {
