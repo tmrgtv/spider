@@ -57,6 +57,7 @@ type RespJSONResource struct {
 type TableGanttAct struct {
 	Code         string  `json:"Code"`
 	OmaGuid      string  `json:"OmaGuid"`
+	Guid     	 string  `json:"Guid"`
 	Start        int64   `json:"Start"`
 	Final        int64   `json:"Fin"`
 	FactStart    int64   `json:"FactStart"`
