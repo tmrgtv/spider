@@ -75,6 +75,28 @@ type RespJSONGanttAct struct {
 	ErrorResp string          `json:"error"`
 }
 
+type TableSkill struct {
+	Code         string `json:"Code"`
+	Name         string `json:"Name"`
+	Type         string `json:"Type"`
+	Folder       string `json:"Folder"`
+	Notes        string `json:"Notes"`
+	DPH          string `json:"DPH"`
+	Guid         string `json:"Guid"`
+	LineMng      string `json:"ЛИН_РУК"`
+	CFO          string `json:"ЦФО"`
+	JurPers      string `json:"ЮРЛ"`
+	ContentNames string `json:"ContentNames"`
+}
+
+type RespJSONSkill struct {
+	Fields    []FieldsTable `json:"fields"`
+	Array     []TableSkill  `json:"array"`
+	Total     int           `json:"total"`
+	ErrCode   int           `json:"errcode"`
+	ErrorResp string        `json:"error"`
+}
+
 func OpenFile(url, PathSpiderDB string) (string, error) {
 	var respOF RespOpenFile
 	body := []byte(`{"command":"openFile", "fileName":"` + strings.ReplaceAll(PathSpiderDB, `\`, `\\`) + `", "sessId":""}`) //открываем файл с базой Спайдера
@@ -167,6 +189,28 @@ func GetTableGanttAct(url, tableHandle string) ([]TableGanttAct, error) {
 	}
 	if respGT.ErrCode > 0 {
 		return respGT.Array, fmt.Errorf("ошбика без описания на getTable таблицы GanttAct")
+	}
+	return respGT.Array, nil
+}
+
+func GetTableSkill(url, tableHandle string) ([]TableSkill, error) {
+	var respGT RespJSONSkill
+	body := []byte(`{"command":"getTable","tableHandle":` + tableHandle + `,"sessId":""}`) //получем значения в таблице
+	reqGetTable, err := http.Post(url, "application/json", bytes.NewBuffer(body))
+	if err != nil || reqGetTable.StatusCode != 200 {
+		return nil, fmt.Errorf("ошибка метода http Post команды getTable таблицы Skill: %v", err)
+	}
+	defer reqGetTable.Body.Close()
+	jsondec := json.NewDecoder(reqGetTable.Body)
+	err = jsondec.Decode(&respGT)
+	if err != nil {
+		return nil, fmt.Errorf("ошибка чтения ответа json команды getTable таблицы Skill: %v", err)
+	}
+	if len(respGT.ErrorResp) > 0 {
+		return respGT.Array, fmt.Errorf("ошибка на getTable таблицы Skill: %v", respGT.ErrorResp)
+	}
+	if respGT.ErrCode > 0 {
+		return respGT.Array, fmt.Errorf("ошбика без описания на getTable таблицы Skill")
 	}
 	return respGT.Array, nil
 }
