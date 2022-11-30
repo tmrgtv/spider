@@ -55,8 +55,8 @@ type RespJSONResource struct {
 }
 
 type TableGanttAct struct {
+	Level        string  `json:"Level"`
 	Code         string  `json:"Code"`
-	OmaGuid      string  `json:"OmaGuid"`
 	Guid         string  `json:"Guid"`
 	Start        int64   `json:"Start"`
 	Final        int64   `json:"Fin"`
@@ -64,7 +64,6 @@ type TableGanttAct struct {
 	FactFinal    int64   `json:"FactFin"`
 	WorkLoadPlan float64 `json:"WorkLoadSum"`
 	WorkLoadFact float64 `json:"WorkLoadFact"`
-	ShortName    string  `json:"ShortName"`
 }
 
 type RespJSONGanttAct struct {
