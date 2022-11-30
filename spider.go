@@ -193,7 +193,7 @@ func GetTableGanttAct(url, tableHandle string) ([]TableGanttAct, error) {
 	return respGT.Array, nil
 }
 
-func GetTableSkill(url, tableHandle string) ([]TableSkill, error) {
+func GetTableSkill(url, tableHandle string) (map[string]TableSkill, error) {
 	var respGT RespJSONSkill
 	body := []byte(`{"command":"getTable","tableHandle":` + tableHandle + `,"sessId":""}`) //получем значения в таблице
 	reqGetTable, err := http.Post(url, "application/json", bytes.NewBuffer(body))
@@ -206,13 +206,17 @@ func GetTableSkill(url, tableHandle string) ([]TableSkill, error) {
 	if err != nil {
 		return nil, fmt.Errorf("ошибка чтения ответа json команды getTable таблицы Skill: %v", err)
 	}
+	mapSkill := make(map[string]TableSkill, len(respGT.Array))
+	for _, el := range respGT.Array {
+		mapSkill[el.Guid] = el
+	}
 	if len(respGT.ErrorResp) > 0 {
-		return respGT.Array, fmt.Errorf("ошибка на getTable таблицы Skill: %v", respGT.ErrorResp)
+		return mapSkill, fmt.Errorf("ошибка на getTable таблицы Skill: %v", respGT.ErrorResp)
 	}
 	if respGT.ErrCode > 0 {
-		return respGT.Array, fmt.Errorf("ошбика без описания на getTable таблицы Skill")
+		return mapSkill, fmt.Errorf("ошбика без описания на getTable таблицы Skill")
 	}
-	return respGT.Array, nil
+	return mapSkill, nil
 }
 
 func ClearFilterTable(url, tableHandle, nameTable string) error {
